@@ -17,10 +17,10 @@ To run this project, you need to install the following packages:
 1.	pip install mysql-connector-python
 2.	pip install pandas
 3.	pip install google-api-python-client
-4.	pip install google-api-python-client
-5.	pip install streamlit
-6.	pip install requests-cache
-Usage
+4.	pip install streamlit
+5.	pip install requests-cache
+
+
 To use this project, follow these steps:
 1.	Clone the repository: git clone https://github.com/Ragavirvk/Assignment-1
 2.	Install the required packages: pip install -r requirements.txt
@@ -47,11 +47,11 @@ Users can choose which channel's data to migrate. To ensure compatibility with a
 Data Analysis
 The project provides comprehensive data analysis capabilities using Streamlit. users can create interactive gain insights from the collected data.
 
-• Channel Analysis:
+Channel Analysis:
 Channel analysis includes insights on playlists, videos, subscribers, views, likes, comments, and durations. Gain a deep understanding of the channel's performance and audience engagement through detailed summaries.
 
-• Video Analysis:
-Video analysis focuses on views, likes, comments, and durations, enabling both an overall channel and specific channel perspectives.
+Video Analysis:
+Video analysis focuses on views, likes, dislike, comments, and durations enabling both an overall channel and specific channel perspectives.
 
 Contributing:
 Contributions to this project are welcome! If you encounter any issues or have suggestions for improvements, please feel free to submit a pull request.

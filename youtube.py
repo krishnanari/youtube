@@ -372,9 +372,20 @@ def questions_page():
         elif selected_question == questions[2]:
             cursor.execute("SELECT Title, channel_name, view FROM videos ORDER BY view DESC LIMIT 10")
         elif selected_question == questions[3]:
-            cursor.execute("SELECT Title, COUNT(*) as comments FROM videos GROUP BY Title")
+            cursor.execute("""SELECT v.Title, COUNT(c.comment_Id) AS num_comments
+                                FROM videos v
+                                LEFT JOIN comment_info c ON v.video_Id = c.video_Id
+                                GROUP BY v.video_Id, v.Title;
+                                """)
         elif selected_question == questions[4]:
-            cursor.execute("SELECT MAX(likes) as max_likes FROM videos")
+           cursor.execute("""SELECT v.Title, v.likes, v.channel_Name
+                            FROM videos v
+                            JOIN (
+                                SELECT channel_Name, MAX(likes) as max_likes
+                                FROM videos
+                                GROUP BY channel_Name
+                            ) mv ON v.channel_Name = mv.channel_Name AND v.likes = mv.max_likes
+                            """)
         elif selected_question == questions[5]:
             cursor.execute("SELECT Title, SUM(likes) as total_likes, SUM(dislikes) as total_dislikes FROM videos GROUP BY Title")
         elif selected_question == questions[6]:
@@ -389,12 +400,13 @@ def questions_page():
                             ) AS durations 
                             GROUP BY channel_name """)
         elif selected_question == questions[9]:
-            cursor.execute("""SELECT Title, channel_name, COUNT(*) as comment_count 
-                FROM videos 
-                GROUP BY Title, channel_name 
-                ORDER BY comment_count DESC 
-                LIMIT 1
-            """)
+            cursor.execute("""SELECT v.Title, v.channel_Name, COUNT(c.comment_Id) AS num_comments
+                            FROM videos v
+                            LEFT JOIN comment_info c ON v.video_Id = c.video_Id
+                            GROUP BY v.video_Id, v.Title, v.channel_Name
+                            ORDER BY num_comments DESC
+                            LIMIT 1
+                            """)
 
         data = cursor.fetchall()
         df = pd.DataFrame(data)

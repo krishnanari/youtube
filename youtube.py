@@ -305,12 +305,13 @@ def insert_playlist_details(playlist_details):
             val = (data['Playlist_Id'], data['channel_Name'], data['channel_Id'], data['video_Id'], data['Title'], data['Published_date'], data['video_count'])
             cursor.execute(sql, val)
     mydb.commit()
+    
 # Streamlit app
 import streamlit as st
 
 def main():
     st.sidebar.title("Navigation")
-    option = st.sidebar.radio("", ["Home", "Channel Details", "Go to Question"])
+    option = st.sidebar.radio("Select an option", ["Home", "Channel Details", "Go to Question"])
 
     if option == "Home":
         st.title(":red[YOUTUBE DATA HAVERSTING AND WAREHOUSING]")
@@ -367,31 +368,65 @@ def questions_page():
     if st.button('Submit'):
         if selected_question == questions[0]:
             cursor.execute("SELECT  Title, channel_name FROM videos")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['video Title','Channel_Name'])
+            st.write(df)
+
+        
+           
         elif selected_question == questions[1]:
             cursor.execute("SELECT channel_name, COUNT(*) as video_count FROM videos GROUP BY channel_name ORDER BY video_count DESC")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['Channel_Name', 'No of videos'])
+            st.write(df)
+
+        
+
         elif selected_question == questions[2]:
             cursor.execute("SELECT Title, channel_name, view FROM videos ORDER BY view DESC LIMIT 10")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['Video_Title', 'Channel name','View Count'])
+            st.write(df)
+
+          
         elif selected_question == questions[3]:
-            cursor.execute("""SELECT v.Title, COUNT(c.comment_Id) AS num_comments
-                                FROM videos v
-                                LEFT JOIN comment_info c ON v.video_Id = c.video_Id
-                                GROUP BY v.video_Id, v.Title;
-                                """)
+            cursor.execute("SELECT Title, COUNT(*) as comments FROM videos GROUP BY Title")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['Video Title', 'No of comments'])
+            st.write(df)
+
+
         elif selected_question == questions[4]:
-           cursor.execute("""SELECT v.Title, v.likes, v.channel_Name
-                            FROM videos v
-                            JOIN (
-                                SELECT channel_Name, MAX(likes) as max_likes
-                                FROM videos
-                                GROUP BY channel_Name
-                            ) mv ON v.channel_Name = mv.channel_Name AND v.likes = mv.max_likes
-                            """)
+            cursor.execute("SELECT MAX(likes) as max_likes FROM videos")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['Highest Likes'])
+            st.write(df)
+
+           
+
         elif selected_question == questions[5]:
             cursor.execute("SELECT Title, SUM(likes) as total_likes, SUM(dislikes) as total_dislikes FROM videos GROUP BY Title")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['Video Title','Like Count','Dislike Count'])
+            st.write(df)
+
         elif selected_question == questions[6]:
             cursor.execute("SELECT channel_name, SUM(view) as total_views FROM videos GROUP BY channel_name")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['Channel Name', 'No of views'])
+            st.write(df)
+
+            
+
         elif selected_question == questions[7]:
             cursor.execute("SELECT DISTINCT channel_name FROM videos WHERE YEAR(published_date) = 2022")
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['Channel Name'])
+            st.write(df)
+
+            
+            
+
         elif selected_question == questions[8]:
             cursor.execute("""SELECT channel_name, AVG(duration_minutes) AS avg_duration 
                         FROM (
@@ -399,19 +434,26 @@ def questions_page():
                                 FROM videos
                             ) AS durations 
                             GROUP BY channel_name """)
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['Channel Name', 'Average Sec'])
+            st.write(df)
+            
+           
+
+        
         elif selected_question == questions[9]:
-            cursor.execute("""SELECT v.Title, v.channel_Name, COUNT(c.comment_Id) AS num_comments
-                            FROM videos v
-                            LEFT JOIN comment_info c ON v.video_Id = c.video_Id
-                            GROUP BY v.video_Id, v.Title, v.channel_Name
-                            ORDER BY num_comments DESC
-                            LIMIT 1
-                            """)
+            cursor.execute("""SELECT Title, channel_name, COUNT(*) as comment_count 
+                FROM videos 
+                GROUP BY Title, channel_name 
+                ORDER BY comment_count DESC 
+                LIMIT 1
+            """)
+            data = cursor.fetchall()
+            df = pd.DataFrame(data, columns=['Channel Title', 'Channel Name','No of Counts'])
+            st.write(df)
 
-        data = cursor.fetchall()
-        df = pd.DataFrame(data)
-        st.write(df)
-
+           
+    
     if st.button('Go to Home Page'):
         st.session_state.page = 'main_page'
 
